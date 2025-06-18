@@ -1,4 +1,5 @@
 package main
+
 import "fmt"
 
 func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
@@ -26,8 +27,10 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 	}
 	
 	// -1 means not found
-    result1 := -1
-    result2 := -1		
+    result1 := 0
+    result2 := 0
+
+	gotResult1 := false
 
 	var longNums, shortNums []int
 	var longLen, shortLen int
@@ -54,7 +57,7 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 	if shortLen == 0 {
 		goby = 1 // goby, find one smaller, goby ++
 		for _, v := range longNums {
-			if result1 == -1 {
+			if !gotResult1 {
 				if goby == mid1 {
 					result1 = v
 					println("1. get result1", result1)
@@ -62,18 +65,18 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 						println("1. end result1", result1)
 						return float64(result1)
 					}
+					gotResult1 = true
 				}
 				goby ++
 				continue
 			}
-			if result2 == -1 {
-				if goby == mid2 {
-					result2 = v
-					println("1. end result1 result2", result1, result2)
-					return float64(result1 + result2) / 2
-				}
-				goby ++
+			// find result2 after got result1
+			if goby == mid2 {
+				result2 = v
+				println("1. end result1 result2", result1, result2)
+				return float64(result1 + result2) / 2
 			}
+			goby ++
 		}
 	}
 	
@@ -100,16 +103,17 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 			break
 		}
 		vv = shortNums[vvIndex]
-		if result1 == -1 {
+		if !gotResult1 {
 			// find result1
 			if v <= vv {
 				if goby == mid1 {
 					result1 = v
 					println("2.1 v is the result1", result1, "at ", i)
-				}
-				if result1 != -1 && !needTwo {
-					println("2.1 end result1", result1)
-					return float64(result1)
+					if !needTwo {
+						println("2.1 end result1", result1)
+						return float64(result1)
+					}
+					gotResult1 = true
 				}
 				if i == (longLen -1 ) {
 					println("2.1 longEnd")
@@ -126,10 +130,11 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 				if goby == mid1 {
 					result1 = vv
 					println("2.2 vv is the result1", result1, "at ", vvIndex)
-				}
-				if result1 != -1 && !needTwo {
-					println("2.2 vv end result1", result1)
-					return float64(result1)
+					if !needTwo {
+						println("2.2 end result1", result1)
+						return float64(result1)
+					}
+					gotResult1 = true
 				}
 				if vvIndex == (shortLen -1 ) {
 					println("2.2 shortEnd")
@@ -144,12 +149,7 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 				// goto l2: current v compare with next vv
 			}
 		} else {
-			// go on find result2
-			if result2 != -1 {
-				// got result2
-				println("2.3 end the result1, result2", result1, result2)
-				return float64(result1 + result2) / 2
-			}
+			// find result2 after got result1
 			if v <= vv {
 				if goby == mid2 {
 					result2 = v
@@ -190,16 +190,17 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 		// 4. go to l2 loop, v compare with next vv
 		for ii = vvIndex; ii < shortLen; {
 			vv = shortNums[vvIndex]
-			if result1 == -1 {
+			if !gotResult1 {
 				// find result1
 				if vv <= v {
 					if goby == mid1 {
 						result1 = vv
 						println("4.1 vv is the result1", result1, "at ", goby)
-					}
-					if result1 != -1 && !needTwo{
-						println("4.1 vv end result1", result1)
-						return float64(result1)
+						if !needTwo {
+							println("4.1 end result1", result1)
+							return float64(result1)
+						}
+						gotResult1 = true
 					}
 					if ii == (shortLen-1) {
 						println("4.1 vv shortEnd")
@@ -216,10 +217,11 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 					if goby == mid1 {
 						result1 = v
 						println("4.2 v is the result1", result1, "at ", goby)
-					}
-					if result1 != -1 && !needTwo{
-						println("4.2 v end result1", result1)
-						return float64(result1)
+						if !needTwo {
+							println("4.2 end result1", result1)
+							return float64(result1)
+						}
+						gotResult1 = true
 					}
 					vvIndex = ii 
 					if i == (longLen -1) {
@@ -234,12 +236,6 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 					break // goto l1: current vv compare with next v
 				}
 			} else {
-				// go on find result2
-				if result2 != -1 {
-					// got result2
-					println("4.3 end the result1, result2", result1, result2)
-					return float64(result1 + result2) / 2
-				}
 				if vv <= v {
 					if goby == mid2 {
 						result2 = vv
@@ -285,7 +281,7 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 		println("5. longStop shortStop", longStop, shortStop)
 		for i:=shortStop; i < shortLen; i++ {
 			goby ++
-			if result1 == -1 && goby == mid1 {
+			if !gotResult1 && goby == mid1 {
 					result1 = longNums[i]
 					println("5. get result1", result1)
 					if !needTwo {
@@ -294,7 +290,7 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 					}
 					continue
 			}
-			if result2 == -1 && goby == mid2 {
+			if goby == mid2 {
 				result2 = longNums[i]
 				println("5. end result1 result2", result1, result2)
 				return float64(result1 + result2) / 2
@@ -309,7 +305,7 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 		println("6. longStop shortStop", longStop, shortStop)
 		for i:=longStop; i < longLen; i++ {
 			goby ++
-			if result1 == -1 && goby == mid1 {
+			if !gotResult1 && goby == mid1 {
 					result1 = longNums[i]
 					println("6. get result1", result1)
 					if !needTwo {
@@ -318,7 +314,7 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 					}
 					continue
 			}
-			if result2 == -1 && goby == mid2 {
+			if goby == mid2 {
 				result2 = longNums[i]
 				println("6. end result1 result2", result1, result2)
 				return float64(result1 + result2) / 2
