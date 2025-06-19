@@ -189,7 +189,8 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 		println("l2 loop: i ii v vv", i, vvIndex, v, vv)
 		// 4. go to l2 loop, v compare with next vv
 		for ii = vvIndex; ii < shortLen; {
-			vv = shortNums[vvIndex]
+			vv = shortNums[ii]
+			println("4.1 i ii v vv", i, ii, v, vv)
 			if !gotResult1 {
 				// find result1
 				if vv <= v {
@@ -325,8 +326,8 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 }
 
 func main() {
-	nums1 := []int{3}
-	nums2 := []int{-2,-1}
+	nums1 := []int{2,2,4,4}
+	nums2 := []int{2,2,4,4}
 	res := findMedianSortedArrays(nums1, nums2)
 	println(res)
 }
