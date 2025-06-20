@@ -1,6 +1,6 @@
 package main
 
-import "fmt"
+// import "fmt"
 
 // define singly-linked list
 type ListNode struct {
@@ -44,11 +44,12 @@ for {
 
 // format arr to listNode
 func format(arr []int) *ListNode {
-maxPos := len(arr) -1  
+// maxPos := len(arr) -1  
 var head, prv *ListNode
 for i := range arr {
     // init node
-    v := arr[maxPos-i]
+    // v := arr[maxPos-i]
+    v := arr[i]
     println(v)
     tmp := ListNode{V:v}
     if i == 0 {
@@ -67,8 +68,8 @@ func main(){
   l1 := []int{2, 4, 3}
   l2 := []int{5, 6, 4}
   
-  fmt.Println("l1: %v", l1)
-  fmt.Println("l2: %v", l2)
+  // fmt.Println("l1: %v", l1)
+  // fmt.Println("l2: %v", l2)
 
   ln1 := format(l1)
   ln2 := format(l2)
