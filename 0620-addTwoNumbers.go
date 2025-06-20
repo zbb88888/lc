@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 // define singly-linked list
 type ListNode struct {
   V int
@@ -56,6 +58,7 @@ for i := range arr {
     }
     prv.Next = &tmp
   }
+println("format end")
 return head
 }
 
@@ -63,6 +66,9 @@ func main(){
  
   l1 := []int{2, 4, 3}
   l2 := []int{5, 6, 4}
+  
+  fmt.Println("l1: %v", l1)
+  fmt.Println("l2: %v", l2)
 
   ln1 := format(l1)
   ln2 := format(l2)
