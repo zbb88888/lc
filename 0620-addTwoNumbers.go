@@ -11,7 +11,7 @@ type ListNode struct {
 }
 
 // format arr to listNode
-func format(arr []int) (*ListNode) {
+func format(arr []int) *ListNode {
        if arr == nil {
          return nil
        }
@@ -39,53 +39,42 @@ func format(arr []int) (*ListNode) {
 	return head
 }
 
-func sumListNode(l *ListNode) int {
-        if l == nil {
-          return 0
-        }
-	n := l
-        v := n.Val
-	result := 0
-	decimal := 1
-	for {
-                println("sum v: ", v)
-		result += decimal * v
-                // next loop + next v
-		n = n.Next
-                if n == nil {
-                break
-                }
-                v = n.Val
-		decimal *= 10
-	}
-        println("end sum result: ", result)
-	return result
-}
 func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
-	sum1 := sumListNode(l1)
-	sum2 := sumListNode(l2)
-	sum := sum1 + sum2
-	println("end sum: ", sum)
-        // 0
-
 	result := []int{}
-	tmp := 0
-        if sum < 10 {
-	  result = append(result, sum)
-	  ln := format(result)
-	  return ln
-        }
-
-	res := sum
+        var l1End, l2End, addOne bool
+        l1Next := l1
+        l2Next := l2
 	for {
-		tmp = res % 10
-		res = res / 10
-		println("res tmp", res, tmp)
-		result = append(result, tmp)
-		if res < 10 {
-		  result = append(result, res)
-		  break
-		}
+                tmp := 0
+                if l1Next == nil {
+                    l1End = true
+                }else {
+                    tmp += l1Next.Val
+		    println("tmp, + l1Next v, l2 v", tmp, l1Next.Val)
+                    l1Next = l1Next.Next
+                }
+                if l2Next == nil {
+                    l2End = true
+                }else {
+                    tmp += l2Next.Val
+		    println("tmp, + l2Next v, l2 v", tmp, l2Next.Val)
+                    l2Next = l2Next.Next
+                }
+                if addOne {
+                    tmp += 1
+                }
+                if l1End && l2End {
+		  println("end tmp: ", tmp)
+		  result = append(result, tmp)
+                  break
+                }
+		if tmp < 10 {
+		  result = append(result, tmp)
+                  addOne = false
+		} else {
+		  result = append(result, tmp-10)
+                  addOne = true
+                }
 	}
 	fmt.Println("result: ", result)
 	ln := format(result)
@@ -95,10 +84,8 @@ func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
 func main() {
 	arr1 := []int{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}
 	arr2 := []int{5,6,4}
-	l1 := format(arr1)
-	l2 := format(arr2)
-        // maxLen 最大为 longLen + 1
-        // 分为求和部分和进位部分 两部分
         // 其实不需要求和，只需要考虑是否进位即可 
-	addTwoNumbers(l1, l2)
+	ln1 := format(arr1)
+	ln2 := format(arr2)
+	addTwoNumbers(ln1, ln2)
 }
