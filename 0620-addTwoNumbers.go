@@ -1,6 +1,6 @@
 package main
 
-// import "fmt"
+import "math"
 
 // define singly-linked list
 type ListNode struct {
@@ -8,49 +8,16 @@ type ListNode struct {
   Next *ListNode
 }
 
-
-func addTwoNumbers(l1, l2 *ListNode) *ListNode {
-
-println("printListNode l1")
-printListNode(l1)
-println("printListNode l2")
-printListNode(l2)
-
-return nil
-
-}
-
-func printListNode(ln *ListNode) {
-if ln == nil {
-    println("ln is nil")
-    return
-}
-println("ln.V: ", ln.V)
-if ln.Next == nil {
-    println("ln.Next is nil")
-    return
-}
-
-for {
-      n := ln.Next
-      if n != nil {
-        println(n.V)
-        ln = ln.Next
-      } else {
-        break
-      }
-  }
-}
-
 // format arr to listNode
-func format(arr []int) *ListNode {
+func format(arr []int) (*ListNode, int) {
 // maxPos := len(arr) -1  
 var head, prv *ListNode
+result := 0
 for i := range arr {
-    // init node
-    // v := arr[maxPos-i]
     v := arr[i]
-    println(v)
+    println("v: ", v)
+    result += v * int(math.Pow(10, float64(i)))
+    println("result: ", result)
     tmp := ListNode{V:v}
     if i == 0 {
       head = &tmp
@@ -59,8 +26,8 @@ for i := range arr {
     }
     prv.Next = &tmp
   }
-println("format end")
-return head
+  println("format end, sum: ", result)
+  return head, result
 }
 
 func main(){
@@ -71,10 +38,12 @@ func main(){
   // fmt.Println("l1: %v", l1)
   // fmt.Println("l2: %v", l2)
 
-  ln1 := format(l1)
-  ln2 := format(l2)
+  println("format l1")
+  _, sum1 := format(l1)
+  println("format l2")
+  _, sum2 := format(l2)
 
-  ln := addTwoNumbers(ln1, ln2)
-  println("printListNode result")
-  printListNode(ln)
+  sum := sum1 + sum2
+  println("end sum: ", sum)
+
 }
