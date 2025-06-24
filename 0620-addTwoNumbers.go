@@ -6,7 +6,7 @@ import (
 
 // define singly-linked list
 type ListNode struct {
-	V    int
+	Val    int
 	Next *ListNode
 }
 
@@ -18,7 +18,7 @@ func format(arr []int) (*ListNode) {
 	var head, priv *ListNode
 	for i := range arr {
                 println("format: v", arr[i])
-		now := &ListNode{V: arr[i]}
+		now := &ListNode{Val: arr[i]}
                 // init 0
                 if head == nil {
                    head = now
@@ -44,7 +44,7 @@ func sumListNode(l *ListNode) int {
           return 0
         }
 	n := l
-        v := n.V
+        v := n.Val
 	result := 0
 	decimal := 1
 	for {
@@ -55,7 +55,7 @@ func sumListNode(l *ListNode) int {
                 if n == nil {
                 break
                 }
-                v = n.V
+                v = n.Val
 		decimal *= 10
 	}
         println("end sum result: ", result)
@@ -66,10 +66,17 @@ func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
 	sum2 := sumListNode(l2)
 	sum := sum1 + sum2
 	println("end sum: ", sum)
-	result := []int{}
-	res := sum
-	tmp := 0
+        // 0
 
+	result := []int{}
+	tmp := 0
+        if sum < 10 {
+	  result = append(result, sum)
+	  ln := format(result)
+	  return ln
+        }
+
+	res := sum
 	for {
 		tmp = res % 10
 		res = res / 10
@@ -86,8 +93,8 @@ func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
 }
 
 func main() {
-	arr1 := []int{2, 4, 3}
-	arr2 := []int{5, 6, 4}
+	arr1 := []int{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}
+	arr2 := []int{5,6,4}
 	l1 := format(arr1)
 	l2 := format(arr2)
 	addTwoNumbers(l1, l2)
