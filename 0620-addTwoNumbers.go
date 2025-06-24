@@ -97,5 +97,8 @@ func main() {
 	arr2 := []int{5,6,4}
 	l1 := format(arr1)
 	l2 := format(arr2)
+        // maxLen 最大为 longLen + 1
+        // 分为求和部分和进位部分 两部分
+        // 其实不需要求和，只需要考虑是否进位即可 
 	addTwoNumbers(l1, l2)
 }
