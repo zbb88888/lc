@@ -3,23 +3,75 @@ package main
 import (
   "fmt"
   "math"
+  "strconv"
 )
 
 
 func myAtoi(s string) int {
 
 // 去除空格
-
 // 判断 + -
-
 // 跳过 0
-
 // 读取
-
 // 直到结尾（非数字）
 
+numbers := ""
+for i, v := range s {
+  
+  sv := string(v)
+  if sv == " " {
+    if numbers != "" {
+      fmt.Println("end at: ", i, sv)
+      break
+    }
+    continue
+  }
+  
 
-    
+  if sv == "+" || sv == "-" {
+    if numbers != "" {
+      fmt.Println("end at: ", i, sv)
+      break
+    }
+    numbers += sv
+  }
+
+  // get 0-9
+  if "0" <= sv && sv <= "9" {
+    numbers += sv
+    continue
+  }
+
+  // end
+  if sv == "." {
+    fmt.Println("end at: ", i, sv)
+    break
+  }
+
+  if "a" <= sv && sv <= "z" {
+    fmt.Println("end at: ", i, sv)
+    break
+  }
+
+}
+
+fmt.Println("numbers: ", numbers)
+result, err := strconv.Atoi(numbers)
+if err != nil {
+  fmt.Println("err: ", err)
+}
+
+fmt.Println("result: ", result)
+if result < math.MinInt32 {
+  return math.MinInt32
+}
+
+if result > math.MaxInt32 {
+  return math.MaxInt32
+}
+
+return result
+
 }
 
 
@@ -37,6 +89,6 @@ func main(){
 
 s := "1337c0d3"
 
-myAtoi()
+myAtoi(s)
 
 }
