@@ -24,7 +24,28 @@ func isPalindrome(x int) bool {
   }
 
 
+  res := 0
+  tmp := x
+  yu := tmp%10
+  res += yu
+  fmt.Println("tmp: ", res)
 
+  for {
+    tmp = tmp/10
+    res *= 10
+    if tmp < 10 {
+      res += tmp
+      fmt.Println("end: ", res)
+      break
+    }
+    yu := tmp%10
+    res += yu
+  }
+
+  if res == x {
+    return true
+  }
+  return false
     
 }
 
@@ -32,7 +53,7 @@ func isPalindrome(x int) bool {
 
 func main(){
 
-input: = 123
+input := 123
 
 isPalindrome(input)
 
