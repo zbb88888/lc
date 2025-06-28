@@ -32,6 +32,7 @@ func isMatch(s string, p string) bool {
 	findStartAfterX := false // 开始的时候 xx*, x* 为空， 可跳过
 	findStarAfterX := false // 然后只能 x* 为空， 可跳过
 	holdStar := false    // 如果匹配则一直匹配，如果不匹配则跳过 star（匹配到0个），* 为空，可跳过
+        mustGet := ""	     // mustGet 是正则模板中 .* 之后必须要匹配到的字符，如果找不到，就是不匹配
 	// 这两个状态是互相独立的 没有优先或者依赖关系
 	for spos < slen {
              if spos > 0 {
@@ -45,9 +46,29 @@ func isMatch(s string, p string) bool {
 	        break
              }
 	     ssv := string(s[spos])
+             spv := string(p[ppos])
+             if mustGet == "." {
+	          // .* .*. .*..  以此类， 只需要继续迭代，拿到下一个字符 
+                  // 保持现状
+		  ppos ++
+		  // 至少对应一个字符
+		  spos ++
+		  continue
+	     }
+
+	     if mustGet != "" {
+		if ssv == spv {
+                    fmt.Println("re start from must get: ", mustGet, "spos", spos)
+		    mustGet = ""
+		    spos ++
+		    continue
+		} 
+		fmt.Println("must get skip: ", "spos", spos, "ssv", ssv)
+		spos ++
+		continue
+	     }
 
 	     if findStartAfterX {
-               spv := string(p[ppos])
 	       if spv != "*" {
                   ppos ++
 		  continue
@@ -60,7 +81,6 @@ func isMatch(s string, p string) bool {
 	     }
 
 	     if findStarAfterX {
-               spv := string(p[ppos])
 	       if spv != "*" {
 		  fmt.Println("end loop1: false")
 		  return false
@@ -100,17 +120,28 @@ func isMatch(s string, p string) bool {
 		fmt.Println("loop2 check: ", "ssv", ssv, "spv", spv, "beforeSSV", beforeSSV)
 		// . 直接都前进1
                 if spv == "." {
-		      spos ++ 
                       ppos ++
 		      // 判断下一个是否是 *， 如果是当作一个字符进行逻辑判断
 		      if ppos < plen && string(p[ppos]) == "*" {
-                         fmt.Println(".* just end")
-			 if len(p) > 2 {
-                             fmt.Println(".* just end > 2, false")
-                             return false
+			 // 经过一个.*，至少再跳过2个字符，贪心
+                         spos += 2
+			 // .* 可以看作 零个或者 多个
+			 // 如果是 .* 结尾，直接结束
+                         ppos ++
+		         if ppos == plen {
+                              fmt.Println(".* just end")
+			      return true
+		         }
+			 // 如果 .* 之后还有字符，依旧需要优先匹配字符
+			 // 缓存该字符，直接跳到该字符后，继续
+		         if ppos < plen {
+			      mustGet = string(p[ppos])
+			      fmt.Println("after .* mustGet: ", mustGet)
+			      break
 			 }
-			 return true
 		      } 
+		      // 只是 . 必须匹配一个字符
+		      spos ++
 		      break
 		 }
 	         // 匹配零个或多个前面的那一个元素, 在这里前面的元素就是 'a'。因此，字符串 "aa" 可被视为 'a' 重复了一次。
@@ -155,10 +186,10 @@ func isMatch(s string, p string) bool {
 
 send := false
 pend := false
-if spos == slen {
+if spos >= slen {
    send = true
 }
-if ppos == plen {
+if ppos >= plen {
    pend = true
 }
 
@@ -203,6 +234,15 @@ if pleft >= 2 {
   // 去空后看是否 < = 2
   left := p[ppos+1:]
   fmt.Println("left: ", left)
+
+  if len(left) == 1 {
+    if string(left[0]) == "."{
+         return true
+    }
+    if string(left[0]) == "*"{
+     return true
+    }
+  }
   cutFrom := 0
   findStar := false
   for i, v := range left {
@@ -230,10 +270,17 @@ if pleft >= 2 {
 	   }
 
 	}
-
         fmt.Println("end false 3")
-        if endLen == 1 && string(thePLeft[0]) == lasts{
-           return true
+        if endLen == 1 { 
+	    if string(thePLeft[0]) == "."{
+               return true
+            }
+	    if string(thePLeft[0]) == "*"{
+               return true
+            }
+	    if string(thePLeft[0]) == lasts{
+               return true
+            }
         }
         if endLen == 2 && string(thePLeft[0]) == lasts{
            return true
@@ -255,8 +302,8 @@ return false
 
 func main(){
 
-s := "bbbba"
-p := ".*a*a"
+s := "a"
+p := ".*."
 
 // 由于正则表达式不能以* 号开头，所以都以 x* 格式开头 相当于 空
 // 关于是否贪心的问题，如果P 已经用尽，那么只能选择贪心即用 * 号多匹配一次
