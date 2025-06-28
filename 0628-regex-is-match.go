@@ -26,6 +26,60 @@ func isMatch(s string, p string) bool {
           return false
 	}
 
+	// 优先处理通配逻辑
+        // found * 
+	// foud . just after *
+	// 计算通配能匹配到的最大字符数目
+	// 这里只考虑都是通配符的场景
+	maxAs := 0
+	minAs := 0
+	for i, v := range p {
+	    sv := string(v)
+            if "a" <= sv && sv <= "z" {
+	       if i+1 < plen {
+                   nextSV := string(p[i+1])
+		   if nextSV == "*" {
+		      // ignore x*
+		      // as 0
+	              continue
+		   }
+	           maxAs = 0
+	           minAs = 0
+                   break
+	       }
+	       maxAs = 0
+	       minAs = 0
+               break
+
+            }
+	    if sv == "." {
+	       if i+1 < plen {
+                   nextSV := string(p[i+1])
+		   if nextSV == "*" {
+                       maxAs += 20
+                       minAs += 0
+		       continue
+		   }
+	       }
+               minAs += 1
+	       continue
+	    }
+
+	}
+
+	// 如果都是通配。直接比较字符长度
+
+	if maxAs > 0 || minAs > 0  {
+	  fmt.Println("just simple maxAs", maxAs, "minAs", minAs)
+	  if minAs <= slen && slen <= maxAs {
+	    fmt.Println("just simple match")
+	    return true
+          } else {
+	    fmt.Println("just simple not")
+	    return false
+	  } 
+	}
+
 	spos := 0
 	ppos := 0
 	beforeSSV := ""
@@ -209,10 +263,14 @@ if !send {
 
 pleft := plen - ppos
 if pleft == 1 {
-  if string(p[ppos]) == "*" ||  string(p[ppos]) == "." {
+  if string(p[ppos]) == "*" {
      return true
   } 
-  fmt.Println("end false 2")
+  if string(p[ppos]) == "." {
+     fmt.Println("pleft 1 end false 1")
+     return false
+  }
+  fmt.Println("pleft 1 end false 2")
   return false
 }
 
@@ -228,12 +286,26 @@ if pleft == 2 && beforeSSV == string(p[ppos+1]) {
 lasts :=  string(s[slen-1])
 
 if pleft >= 2 {
+
+  left := p[ppos+1:]
+  fmt.Println("left: ", left)
+  if slen == 1 {
+    if "a" <= string(left[0]) && string(left[0]) <= "z" {
+       fmt.Println("one return false 1")
+       return false
+    }
+
+    if string(left[0]) == "." && string(left[0]) != "*" {
+       fmt.Println("one return false 2")
+       return false
+    }
+  }
+
+
   // 由于正则表达式不能以* 号开头，所以都以 x* 格式开头 相当于 空
   // 由于 第一个 x* 视作为空
   // 后续的 x* * 可视作为空
   // 去空后看是否 < = 2
-  left := p[ppos+1:]
-  fmt.Println("left: ", left)
 
   if len(left) == 1 {
     if string(left[0]) == "."{
@@ -300,10 +372,12 @@ return false
 
 }
 
+// main
+
 func main(){
 
-s := "a"
-p := ".*."
+s := "ab"
+p := ".*c"
 
 // 由于正则表达式不能以* 号开头，所以都以 x* 格式开头 相当于 空
 // 关于是否贪心的问题，如果P 已经用尽，那么只能选择贪心即用 * 号多匹配一次
@@ -314,6 +388,10 @@ p := ".*."
 // *x* 也视作为空
 // 所以如果不匹配的时候，需要考虑找到 x* xx* 几个x 都可以，第一个字母必须匹配
 
+
+// 字符串匹配和通配是两种逻辑
+
+// 所以单独先处理通配的逻辑
 
 
 fmt.Println("input: ", s, p)
