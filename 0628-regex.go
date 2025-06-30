@@ -112,18 +112,21 @@ func isMatch(s string, p string) bool {
 	// 最多只能通配这么多
 
 	var pi, si, preferLen
-	var pv, sv, px, sx string
+	var pv, sv, must string
+	var nextStart bool
 	// 参考 p 进行最小窗口问题划分：
 	// 1. p 中的单个字符 x 必须要匹配到
 	// 1.1 如果 s 存在 x 能和 p 中的 x 匹配上，那就是匹配逻辑
 	// 1.2 否则就是匹配不上的逻辑，x 后必须存在一个 x*，然后跳过
 	// 2. 如果只是一个 . 必须匹配一个字符
 	// 如果匹配不到，那么继续看是否 .*，这样可以跳过
-	// 3. 贪心匹配： 根据当前p和s的剩余差值判断至少需要跳过多少个字符
+	// 3. 贪心匹配： 根据当前 p 和 s 的剩余差值判断至少需要跳过多少个字符
 	// 如果 .* 后存在一个字符，还是要优先匹配该字符，如果不匹配（根据剩余差值判断至少需要跳过多少个字符）
 	for pi, pv = range p {
 		pLeft := p[pi:lenP]
 		sLeft := s[si:lenS]
+		spv := string(pv)
+		ssv := string([s[si]])
 		if slen >= plen {
 			preferS = true
 			preferLen = slen - plen
@@ -132,17 +135,59 @@ func isMatch(s string, p string) bool {
 			preferLen = plen - slen
 		}
 		fmt.Println("preferS:", preferS, "preferLen:", preferLen)
-		spv := string(pv)
 		if "a" <= spv && spv <= "z" {
-			px = sv
+			must = spv
 			// x or x*
+			// must get x or skip x*
 			if i+1 < plen {
-				nextSPV := string(p[i+1])
-				if nextSPV == "*" {
+				if string(p[i+1]) == "*" {
+					nextStar = true
+				}
+			}
+			if must == ssv {
+				// match x, so pass it
+				pi ++
+				si ++
+				if !nextStar {
+					// only match x
 					continue
 				}
-			} ele {
-				fmt.Println("loop1 x end")
+				if nextStar && preferS && preferLen > 0 {
+					// choose to match how many x
+					for si < lens {
+						ssv := string([s[si]])
+						if must == ssv {
+							fmt.Println("keep match x*:", "si", si, "ssv", ssv, preferLen)
+							si ++
+							preferLen --
+							if preferLen > 0 {
+								continue
+							} else {
+								break
+							}
+						}
+						break
+					}
+				}
+				if nextStar && !preferS && preferLen > 0 {
+					// skip x*
+					fmt.Println("skip x*", "pi", pi, "spv", spv, preferLen)
+					pi ++
+					continue
+				}
+			}
+			if must != ssv {
+				pi ++
+				if !nextStar {
+					// can not match x
+					fmt.Println("end not match: ", "pi", pi, "spv", spv, "si", si, "ssv", ssv)
+					return false
+				}
+				if nextStar {
+					pi++
+					fmt.Println("skip x*:", "pi", pi, "spv", spv, "nextStar", nextStar)
+					continue
+				}
 			}
 		}
 		if sv == "." {
