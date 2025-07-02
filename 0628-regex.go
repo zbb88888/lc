@@ -156,24 +156,29 @@ func isMatch(s string, p string) bool {
 					si ++
 					continue
 				}
+
 				if xStar && preferS && preferLen > 0 {
 					// hold x pos of x*
 					for si < lens {
 						// choose to match how many x
 						ssv := string([s[si]])
 						if must == ssv {
-							fmt.Println("keep match x*:", "si", si, "ssv", ssv, preferLen)
+							fmt.Println("x* keep match more x:", "si", si, "ssv", ssv, preferLen)
 							si ++
 							preferLen --
 							if preferLen > 0 {
+								// 还能继续贪心
 								continue
 							} else {
-								// hold x pos of x* until
+								// go after* pos of x* until
 								pi += 2
-								break
+								continue
 							}
+						} else {
+							// *当作匹配 0 个处理
+							pi += 2
+							continue
 						}
-						break
 					}
 				}
 				if xStar && !preferS && preferLen > 0 {
@@ -183,6 +188,8 @@ func isMatch(s string, p string) bool {
 					continue
 				}
 			}
+
+
 			if must != ssv {
 				pi ++
 				if !xStar {
