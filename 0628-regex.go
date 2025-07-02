@@ -113,7 +113,8 @@ func isMatch(s string, p string) bool {
 
 	var pi, si, preferLen
 	var pv, sv, must string
-	var nextStart bool
+	var xStar bool // using in x* case
+	var pointStar bool // using in .* case
 	// 参考 p 进行最小窗口问题划分：
 	// 1. p 中的单个字符 x 必须要匹配到
 	// 1.1 如果 s 存在 x 能和 p 中的 x 匹配上，那就是匹配逻辑
@@ -137,24 +138,28 @@ func isMatch(s string, p string) bool {
 		fmt.Println("preferS:", preferS, "preferLen:", preferLen)
 		if "a" <= spv && spv <= "z" {
 			must = spv
-			// x or x*
-			// must get x or skip x*
+			// 1. p 中的单个字符 x 必须要匹配到
+			// 1.1 如果 s 存在 x 能和 p 中的 x 匹配上，那就是匹配逻辑
+			// 1.2 否则就是匹配不上的逻辑，x 后必须存在一个 x*，然后跳过
 			if i+1 < plen {
 				if string(p[i+1]) == "*" {
-					nextStar = true
+					xStar = true
 				}
 			}
+			// x or x*
+			// must get x or skip x*
 			if must == ssv {
 				// match x, so pass it
-				pi ++
-				si ++
-				if !nextStar {
+				if !xStar {
 					// only match x
+					pi ++
+					si ++
 					continue
 				}
-				if nextStar && preferS && preferLen > 0 {
-					// choose to match how many x
+				if xStar && preferS && preferLen > 0 {
+					// hold x pos of x*
 					for si < lens {
+						// choose to match how many x
 						ssv := string([s[si]])
 						if must == ssv {
 							fmt.Println("keep match x*:", "si", si, "ssv", ssv, preferLen)
@@ -163,13 +168,15 @@ func isMatch(s string, p string) bool {
 							if preferLen > 0 {
 								continue
 							} else {
+								// hold x pos of x* until
+								pi += 2
 								break
 							}
 						}
 						break
 					}
 				}
-				if nextStar && !preferS && preferLen > 0 {
+				if xStar && !preferS && preferLen > 0 {
 					// skip x*
 					fmt.Println("skip x*", "pi", pi, "spv", spv, preferLen)
 					pi ++
@@ -178,33 +185,66 @@ func isMatch(s string, p string) bool {
 			}
 			if must != ssv {
 				pi ++
-				if !nextStar {
+				if !xStar {
 					// can not match x
 					fmt.Println("end not match: ", "pi", pi, "spv", spv, "si", si, "ssv", ssv)
 					return false
 				}
-				if nextStar {
+				if xStar {
 					pi++
-					fmt.Println("skip x*:", "pi", pi, "spv", spv, "nextStar", nextStar)
+					fmt.Println("skip x*:", "pi", pi, "spv", spv, "nextStar", xStar)
 					continue
 				}
 			}
 		}
 		if sv == "." {
-			// . or .*
-			if i+1 < plen {
-				nextSV := string(p[i+1])
+			// 2. 如果只是一个 . 必须匹配一个字符
+			// 如果匹配不到，那么继续看是否 .*，这样可以跳过
+			if pi+1 < plen {
+				nextSV := string(p[pi+1])
 				if nextSV == "*" {
-					maxAs += 20
-					minAs += 0
-					continue
+					// hold . pos of .*
+					pointStar = true
+				} else {
+					// just .
+					pi ++
+					if si+1 < slen {
+						si ++
+					} else {
+						fmt.PrintLn("false: point not match")
+						return false
+					}
 				}
 			}
-			maxAs += 1
-			minAs += 1
+			if pointStar { 
+				if preferS && preferLen > 0 {
+					// .* choose to match how many x
+					for si < lens {
+						ssv := string([s[si]])
+						if must == ssv {
+							fmt.Println("keep match .*:", "si", si, "ssv", ssv, preferLen)
+							si ++
+							preferLen --
+							if preferLen > 0 {
+								continue
+							} else {
+								// hold .* until
+								pi += 2
+								break
+							}
+						}
+						break
+					}
+				}
+			}
+			if pointStar && !preferS && preferLen > 0 {
+				// skip x*
+				fmt.Println("skip x*", "pi", pi, "spv", spv, preferLen)
+				pi ++
+				continue
+			}
 			continue
 		}
-		fmt.Println("dynamic unknown case2")
 	}
 	return false
 
