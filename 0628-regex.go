@@ -137,7 +137,6 @@ func isMatch(s string, p string) bool {
 		}
 		fmt.Println("preferS:", preferS, "preferLen:", preferLen)
 		if "a" <= spv && spv <= "z" {
-			must = spv
 			// 1. p 中的单个字符 x 必须要匹配到
 			// 1.1 如果 s 存在 x 能和 p 中的 x 匹配上，那就是匹配逻辑
 			// 1.2 否则就是匹配不上的逻辑，x 后必须存在一个 x*，然后跳过
@@ -148,10 +147,10 @@ func isMatch(s string, p string) bool {
 			}
 			// x or x*
 			// must get x or skip x*
+			must = spv
 			if must == ssv {
-				// match x, so pass it
 				if !xStar {
-					// only match x
+					// 只能匹配一个
 					pi ++
 					si ++
 					continue
@@ -159,8 +158,9 @@ func isMatch(s string, p string) bool {
 
 				if xStar && preferS && preferLen > 0 {
 					// hold x pos of x*
+					// 目前一直指向 x 的位置
 					for si < lens {
-						// choose to match how many x
+						// 继续贪心匹配更多同样的 x
 						ssv := string([s[si]])
 						if must == ssv {
 							fmt.Println("x* keep match more x:", "si", si, "ssv", ssv, preferLen)
@@ -170,17 +170,19 @@ func isMatch(s string, p string) bool {
 								// 还能继续贪心
 								continue
 							} else {
-								// go after* pos of x* until
+								// 直接跳到 x* 后 * 所在位置
 								pi += 2
 								continue
 							}
 						} else {
-							// *当作匹配 0 个处理
+							// 把 * 当作匹配 0 个处理
 							pi += 2
 							continue
 						}
 					}
 				}
+
+				// s 更长，放弃贪心
 				if xStar && !preferS && preferLen > 0 {
 					// skip x*
 					fmt.Println("skip x*", "pi", pi, "spv", spv, preferLen)
@@ -191,19 +193,23 @@ func isMatch(s string, p string) bool {
 
 
 			if must != ssv {
+				// 当前字符不匹配
 				pi ++
 				if !xStar {
+					// 由于不是 x* 所以无法跳过
 					// can not match x
 					fmt.Println("end not match: ", "pi", pi, "spv", spv, "si", si, "ssv", ssv)
 					return false
 				}
 				if xStar {
+					// 把 x* 整个部分当作匹配 0 个处理
 					pi++
 					fmt.Println("skip x*:", "pi", pi, "spv", spv, "nextStar", xStar)
 					continue
 				}
 			}
 		}
+		// 下次从这里开始 review 注释
 		if sv == "." {
 			// 2. 如果只是一个 . 必须匹配一个字符
 			// 如果匹配不到，那么继续看是否 .*，这样可以跳过
