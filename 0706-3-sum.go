@@ -38,7 +38,7 @@ func threeSum(nums []int) [][]int {
 			l2Builder.WriteString(strconv.Itoa(l2Got[1]))
 			key = l2Builder.String()
 			if _, ok := ijkV[key]; ok {
-				fmt.Println("skip:", key)
+				// fmt.Println("skip:", key)
 				continue
 			}
 			for k = j + 1; k < len(nums); k++ {
@@ -58,7 +58,7 @@ func threeSum(nums []int) [][]int {
 						continue
 					}
 					ijkV[key] = true
-					fmt.Println("cache:", key)
+					// fmt.Println("cache:", key)
 					ret = append(ret, got)
 				}
 			}
