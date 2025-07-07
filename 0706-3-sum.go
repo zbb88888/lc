@@ -21,16 +21,15 @@ func threeSum(nums []int) [][]int {
 	// 用于存储 i 的 v：为 j + k
 	var ret [][]int
 	i, j, k := 0, 0, 0
-	v, vv, sum := 0, 0, 0
+	sum := 0
 	ijkV := make(map[string]bool)
 	var key string
 	var l2Builder, l3Builder strings.Builder
 	for i = 0; i < len(nums); i++ {
 		sum = 0 - nums[i]
 		for j = i + 1; j < len(nums); j++ {
-			v = nums[j]
 			// 这里优先排序, 更容易匹配
-			l2Got := []int{nums[i], v}
+			l2Got := []int{nums[i], nums[j]}
 			slices.Sort(l2Got)
 			l2Builder.Reset()
 			l2Builder.WriteString(strconv.Itoa(l2Got[0]))
@@ -41,11 +40,11 @@ func threeSum(nums []int) [][]int {
 				// fmt.Println("skip:", key)
 				continue
 			}
+			l3v := sum - nums[j]
 			for k = j + 1; k < len(nums); k++ {
-				vv = nums[k]
-				if sum == v+vv {
-					got := []int{nums[i], v, vv}
-					tmp := append(l2Got, vv)
+				if l3v == nums[k] {
+					got := []int{nums[i], nums[j], nums[k]}
+					tmp := append(l2Got, nums[k])
 					slices.Sort(tmp)
 					// 只需要缓存两个值就足够
 					l3Builder.Reset()
