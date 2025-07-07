@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 )
 
 func main() {
@@ -25,23 +26,16 @@ func threeSum(nums []int) [][]int {
 
 	i, j, k := 0, 0, 0
 	v, vv, sum := 0, 0, 0
-	for i, sum = range iNeed {
-		fmt.Println("i", i)
-		for j, v = range nums {
-			fmt.Println("j", j)
-			// j 比 i 快
-			if j <= i {
-				continue
-			}
-			for k, vv = range nums {
-				fmt.Println("ijk", i, j, k)
+	for i = 0; i < len(iNeed); i++ {
+		// fmt.Println("i", i)
+		sum = iNeed[i]
+		for j = i + 1; j < len(nums); j++ {
+			// fmt.Println("j", j)
+			v = nums[j]
+			for k = j + 1; k < len(nums); k++ {
 				// k 指针跑最快
-				if k <= i {
-					continue
-				}
-				if k <= j {
-					continue
-				}
+				vv = nums[k]
+				// fmt.Println("ijk", i, j, k)
 				if sum == v+vv {
 					got := []int{0 - iNeed[i], v, vv}
 					fmt.Println("got:", got)
@@ -50,5 +44,23 @@ func threeSum(nums []int) [][]int {
 			}
 		}
 	}
-	return ret
+	// 这个比对去重太慢了，比如对 [0 -1 1] 排序的处理建立一种字符串
+	// 然后用map key 维护该字符串作为key，即可即时去重
+	var ret1, sorts [][]int
+	for _, v := range ret {
+		duplicate := false
+		tmp := slices.Clone(v)
+		slices.Sort(tmp)
+		for _, vv := range sorts {
+			if slices.Equal(vv, tmp) {
+				duplicate = true
+				break
+			}
+		}
+		if !duplicate {
+			sorts = append(sorts, tmp)
+			ret1 = append(ret1, v)
+		}
+	}
+	return ret1
 }
