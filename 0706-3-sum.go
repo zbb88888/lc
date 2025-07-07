@@ -23,27 +23,29 @@ func threeSum(nums []int) [][]int {
 	i, j, k := 0, 0, 0
 	sum := 0
 	ijkV := make(map[string]bool)
-	var key string
 	var l2Builder, l3Builder strings.Builder
-	for i = 0; i < len(nums); i++ {
+	l2Builder.Grow(10)
+	l3Builder.Grow(10)
+	var key string
+	var l2Got []int
+	l := len(nums)
+	for i = 0; i < l; i++ {
 		sum = 0 - nums[i]
-		for j = i + 1; j < len(nums); j++ {
+		for j = i + 1; j < l; j++ {
 			// 这里优先排序, 更容易匹配
-			l2Got := []int{nums[i], nums[j]}
+			l2Got = []int{nums[i], nums[j]}
 			slices.Sort(l2Got)
 			l2Builder.Reset()
 			l2Builder.WriteString(strconv.Itoa(l2Got[0]))
 			l2Builder.WriteString(" ")
 			l2Builder.WriteString(strconv.Itoa(l2Got[1]))
-			key = l2Builder.String()
-			if _, ok := ijkV[key]; ok {
+			if _, ok := ijkV[l2Builder.String()]; ok {
 				// fmt.Println("skip:", key)
 				continue
 			}
 			l3v := sum - nums[j]
-			for k = j + 1; k < len(nums); k++ {
+			for k = j + 1; k < l; k++ {
 				if l3v == nums[k] {
-					got := []int{nums[i], nums[j], nums[k]}
 					tmp := append(l2Got, nums[k])
 					slices.Sort(tmp)
 					// 只需要缓存两个值就足够
@@ -58,7 +60,7 @@ func threeSum(nums []int) [][]int {
 					}
 					ijkV[key] = true
 					// fmt.Println("cache:", key)
-					ret = append(ret, got)
+					ret = append(ret, []int{nums[i], nums[j], nums[k]})
 				}
 			}
 		}
