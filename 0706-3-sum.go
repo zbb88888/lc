@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"slices"
+	"strconv"
+	"strings"
 )
 
 func main() {
-	input := []int{-1, 0, 1, 2, -1, -4}
+	input := []int{1, 0, -4, 3, -3, 2, 4, -2, 2, 2, 3, -4, -3, -1, -5, -1, 1}
 	fmt.Println("input:", input)
 	ret := threeSum(input)
 	fmt.Println("ret: ", ret)
@@ -18,49 +20,49 @@ func main() {
 func threeSum(nums []int) [][]int {
 	// 用于存储 i 的 v：为 j + k
 	var ret [][]int
-	// 用于存储 i 对应的 j k 的位置
-	iNeed := make(map[int]int)
-	for i, v := range nums {
-		iNeed[i] = 0 - v
-	}
-
 	i, j, k := 0, 0, 0
 	v, vv, sum := 0, 0, 0
-	for i = 0; i < len(iNeed); i++ {
-		// fmt.Println("i", i)
-		sum = iNeed[i]
+	ijkV := make(map[string]bool)
+	var key string
+	var l2Builder, l3Builder strings.Builder
+	for i = 0; i < len(nums); i++ {
+		sum = 0 - nums[i]
 		for j = i + 1; j < len(nums); j++ {
-			// fmt.Println("j", j)
 			v = nums[j]
+			// 这里优先排序, 更容易匹配
+			l2Got := []int{nums[i], v}
+			slices.Sort(l2Got)
+			l2Builder.Reset()
+			l2Builder.WriteString(strconv.Itoa(l2Got[0]))
+			l2Builder.WriteString(" ")
+			l2Builder.WriteString(strconv.Itoa(l2Got[1]))
+			key = l2Builder.String()
+			if _, ok := ijkV[key]; ok {
+				fmt.Println("skip:", key)
+				continue
+			}
 			for k = j + 1; k < len(nums); k++ {
-				// k 指针跑最快
 				vv = nums[k]
-				// fmt.Println("ijk", i, j, k)
 				if sum == v+vv {
-					got := []int{0 - iNeed[i], v, vv}
-					fmt.Println("got:", got)
+					got := []int{nums[i], v, vv}
+					tmp := append(l2Got, vv)
+					slices.Sort(tmp)
+					// 只需要缓存两个值就足够
+					l3Builder.Reset()
+					l3Builder.WriteString(strconv.Itoa(tmp[0]))
+					l3Builder.WriteString(" ")
+					l3Builder.WriteString(strconv.Itoa(tmp[1]))
+					// 这里是排序的结果
+					key = l3Builder.String()
+					if _, ok := ijkV[key]; ok {
+						continue
+					}
+					ijkV[key] = true
+					fmt.Println("cache:", key)
 					ret = append(ret, got)
 				}
 			}
 		}
 	}
-	// 这个比对去重太慢了，比如对 [0 -1 1] 排序的处理建立一种字符串
-	// 然后用map key 维护该字符串作为key，即可即时去重
-	var ret1, sorts [][]int
-	for _, v := range ret {
-		duplicate := false
-		tmp := slices.Clone(v)
-		slices.Sort(tmp)
-		for _, vv := range sorts {
-			if slices.Equal(vv, tmp) {
-				duplicate = true
-				break
-			}
-		}
-		if !duplicate {
-			sorts = append(sorts, tmp)
-			ret1 = append(ret1, v)
-		}
-	}
-	return ret1
+	return ret
 }
